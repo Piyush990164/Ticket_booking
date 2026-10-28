@@ -6,7 +6,7 @@ package ticketbooking2;
 
 /**
  *
- * @author Makrani
+ * @author piyus
  */
 public class TicketBooked extends javax.swing.JFrame {
 
@@ -15,7 +15,210 @@ public class TicketBooked extends javax.swing.JFrame {
      */
     public TicketBooked() {
         initComponents();
+        jButton2.addActionListener(e -> loadBookings());
+        addCancelButton();
     }
+
+    
+
+private void addCancelButton() {
+
+    // Create Cancel Ticket button
+    javax.swing.JButton cancelButton =
+        new javax.swing.JButton("Cancel Ticket");
+
+    // Create a separate bottom panel for the button
+    javax.swing.JPanel bottomPanel =
+        new javax.swing.JPanel(
+            new java.awt.FlowLayout(
+                java.awt.FlowLayout.CENTER, 10, 10
+            )
+        );
+
+    bottomPanel.add(cancelButton);
+
+    // Preserve the existing NetBeans GUI
+    java.awt.Container originalContent = getContentPane();
+
+    // Place the original GUI above the new button panel
+    javax.swing.JPanel newContent =
+        new javax.swing.JPanel(new java.awt.BorderLayout());
+
+    newContent.add(
+        originalContent,
+        java.awt.BorderLayout.CENTER
+    );
+
+    newContent.add(
+        bottomPanel,
+        java.awt.BorderLayout.SOUTH
+    );
+
+    setContentPane(newContent);
+
+    // Increase window height to make room for the button
+    setSize(getWidth(), getHeight() + 60);
+
+    // Connect button to cancellation method
+    cancelButton.addActionListener(e -> cancelTicket());
+
+    revalidate();
+    repaint();
+}
+ 
+
+
+private void cancelTicket() {
+
+    // Check whether a ticket is selected
+    int selectedRow = jTable1.getSelectedRow();
+
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please select a ticket from the table!"
+        );
+        return;
+    }
+
+    // Get Ticket ID from selected row
+    int ticketId = Integer.parseInt(
+        jTable1.getValueAt(selectedRow, 0).toString()
+    );
+
+    // Get Customer ID from search field
+    int customerId;
+
+    try {
+        customerId = Integer.parseInt(
+            jTextField1.getText().trim()
+        );
+    } catch (NumberFormatException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please enter a valid Customer ID!"
+        );
+        return;
+    }
+
+    // Ask for confirmation
+    int confirm = javax.swing.JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to cancel Ticket ID " + ticketId + "?",
+        "Confirm Cancellation",
+        javax.swing.JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm != javax.swing.JOptionPane.YES_OPTION) {
+        return;
+    }
+
+    // Delete booking from SQLite
+    String sql =
+        "DELETE FROM bookings WHERE ticket_id = ? AND customer_id = ?";
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+
+        pst.setInt(1, ticketId);
+        pst.setInt(2, customerId);
+
+        int rowsDeleted = pst.executeUpdate();
+
+        if (rowsDeleted > 0) {
+            javax.swing.JOptionPane.showMessageDialog(
+                this, "Ticket cancelled successfully!"
+            );
+
+            // Refresh booking history
+            loadBookings();
+
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(
+                this, "Ticket not found or already cancelled!"
+            );
+        }
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Cancellation Error: " + ex.getMessage()
+        );
+        ex.printStackTrace();
+    }
+}
+
+private void loadBookings() {
+
+    javax.swing.table.DefaultTableModel model =
+        (javax.swing.table.DefaultTableModel) jTable1.getModel();
+
+    model.setRowCount(0);
+
+    model.setColumnIdentifiers(new Object[]{
+        "Ticket ID", "Match Name", "Venue",
+        "Match Time", "Quantity", "Ticket Price", "Date"
+    });
+
+    // Read Customer ID from search box
+    String customerIdText = jTextField1.getText().trim();
+
+    int customerId;
+
+    try {
+        customerId = Integer.parseInt(customerIdText);
+
+        if (customerId <= 0) {
+            throw new NumberFormatException();
+        }
+
+    } catch (NumberFormatException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please enter a valid Customer ID!"
+        );
+        return;
+    }
+
+    String sql = """
+        SELECT ticket_id, match_name, venue, match_time,
+               quantity, ticket_price, match_date
+        FROM bookings
+        WHERE customer_id = ?
+        ORDER BY ticket_id DESC
+        """;
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+
+        // Set Customer ID before executing query
+        pst.setInt(1, customerId);
+
+        try (java.sql.ResultSet rs = pst.executeQuery()) {
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("ticket_id"),
+                    rs.getString("match_name"),
+                    rs.getString("venue"),
+                    rs.getString("match_time"),
+                    rs.getInt("quantity"),
+                    rs.getInt("ticket_price"),
+                    rs.getString("match_date")
+                });
+            }
+        }
+
+        javax.swing.JOptionPane.showMessageDialog(
+            this,
+            model.getRowCount() + " booking(s) found!"
+        );
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Database Error: " + ex.getMessage()
+        );
+        ex.printStackTrace();
+    }
+}
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.

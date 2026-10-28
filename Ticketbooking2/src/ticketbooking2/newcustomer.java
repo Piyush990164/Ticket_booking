@@ -26,7 +26,90 @@ public class newcustomer extends javax.swing.JFrame {
     public newcustomer() {
         initComponents();
         autoidshow();
+        applyBasicTheme();
     }
+
+    
+private void applyBasicTheme() {
+
+    java.awt.Color navy = new java.awt.Color(23, 37, 84);
+    java.awt.Color blue = new java.awt.Color(37, 99, 235);
+    java.awt.Color light = new java.awt.Color(241, 245, 249);
+
+    // Background
+    jPanel1.setBackground(light);
+
+    // Header
+    jPanel2.setBackground(new java.awt.Color(219, 234, 254));
+    jLabel1.setText("New Customer Registration");
+    jLabel1.setFont(new java.awt.Font("Arial", 1, 22));
+    jLabel1.setForeground(navy);
+    jLabel2.setForeground(navy);
+
+    // Form panels
+    jPanel3.setBackground(java.awt.Color.WHITE);
+    jPanel4.setBackground(java.awt.Color.WHITE);
+
+    jPanel3.setBorder(
+        javax.swing.BorderFactory.createTitledBorder(
+            javax.swing.BorderFactory.createLineBorder(
+                new java.awt.Color(203, 213, 225)
+            ),
+            "Customer Details"
+        )
+    );
+
+    jPanel4.setBorder(
+        javax.swing.BorderFactory.createLineBorder(
+            new java.awt.Color(203, 213, 225)
+        )
+    );
+
+    // Customer ID
+    jLabel12.setForeground(blue);
+    jLabel12.setFont(new java.awt.Font("Arial", 1, 19));
+    txtid.setForeground(navy);
+    txtid.setFont(new java.awt.Font("Arial", 1, 20));
+
+    // Text fields
+    javax.swing.JTextField[] fields = {
+        txtfname, txtlname, txtpincode, txtcont
+    };
+
+    for (javax.swing.JTextField field : fields) {
+        field.setBackground(java.awt.Color.WHITE);
+        field.setForeground(navy);
+        field.setFont(new java.awt.Font("Arial", 0, 13));
+    }
+
+    txtaddr.setBackground(java.awt.Color.WHITE);
+    txtaddr.setForeground(navy);
+    txtaddr.setFont(new java.awt.Font("Arial", 0, 13));
+
+    // Radio buttons
+    r1.setBackground(java.awt.Color.WHITE);
+    r2.setBackground(java.awt.Color.WHITE);
+    r1.setForeground(navy);
+    r2.setForeground(navy);
+
+    // Buttons
+    jButton2.setBackground(blue);
+    jButton2.setForeground(java.awt.Color.WHITE);
+
+    jButton3.setBackground(new java.awt.Color(71, 85, 105));
+    jButton3.setForeground(java.awt.Color.WHITE);
+
+    jButton1.setBackground(blue);
+    jButton1.setForeground(java.awt.Color.WHITE);
+
+    java.awt.Font buttonFont =
+        new java.awt.Font("Arial", 1, 12);
+
+    jButton1.setFont(buttonFont);
+    jButton2.setFont(buttonFont);
+    jButton3.setFont(buttonFont);
+}
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -337,36 +420,29 @@ public class newcustomer extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(800, 510));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-    private void autoidshow()
-    {
-        int auto;
-        
-        try{
-            con = DriverManager.getConnection("jdbc:ucanaccess://C:\\Users\\piyus_\\OneDrive\\Documents\\NetBeansProjects\\Ticketbooking2\\database\\ticketbooking.accdb");
-            Statement st = con.createStatement();
-            ResultSet r = st.executeQuery("select max(regid) from newcust");
-            
-            if( r.next()==true)
-            {
-                auto = r.getInt(1);
-                auto++;
-                
-                txtid.setText(Integer.toString(auto));
-               
-            }
-            
-        }catch(Exception ex)
-        {
-            System.err.println(ex);
-            
+    
+private void autoidshow() {
+
+    String sql = "SELECT COALESCE(MAX(regid), 0) + 1 AS nextid FROM newcust";
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.Statement stmt = con.createStatement();
+         java.sql.ResultSet rs = stmt.executeQuery(sql)) {
+
+        if (rs.next()) {
+            int nextId = rs.getInt("nextid");
+            txtid.setText(String.valueOf(nextId));
         }
-        
-        
-        
-        
-        
-                                             
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "Error generating customer ID: " + ex.getMessage()
+        );
+        ex.printStackTrace();
     }
+}
+
     private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
         // TODO add your handling code here:
         this.setVisible(false);
@@ -380,49 +456,64 @@ public class newcustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtcountryActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        String idd = txtid.getText();
-        String fname = txtfname.getText();
-        String lname = txtlname.getText();
-        String gender ;
-        if(r1.isSelected())
-        {
-            gender = "Male";
-            
-        }else {
-            gender = "Female";
-            
+    
+private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
+
+    String fname = txtfname.getText().trim();
+    String lname = txtlname.getText().trim();
+    String gender = r1.isSelected() ? "Male" : "Female";
+    String pincode = txtpincode.getText().trim();
+    String contactno = txtcont.getText().trim();
+    String address = txtaddr.getText().trim();
+    String state = txtstate.getSelectedItem().toString();
+    String country = txtcountry.getSelectedItem().toString();
+
+    if (fname.isEmpty() || lname.isEmpty() || contactno.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please fill in all required fields!"
+        );
+        return;
+    }
+
+    String sql = """
+        INSERT INTO newcust
+        (fname, lname, gender, pincode, contactno, address, state, country)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(
+             sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+
+        pst.setString(1, fname);
+        pst.setString(2, lname);
+        pst.setString(3, gender);
+        pst.setString(4, pincode);
+        pst.setString(5, contactno);
+        pst.setString(6, address);
+        pst.setString(7, state);
+        pst.setString(8, country);
+
+        pst.executeUpdate();
+
+        try (java.sql.ResultSet keys = pst.getGeneratedKeys()) {
+            if (keys.next()) {
+                txtid.setText(String.valueOf(keys.getInt(1)));
+            }
         }
-        String pincode = txtpincode.getText();
-        String contactno = txtcont.getText();
-        String addrs = txtaddr.getText();
-        String conts = txtcont.getText();
-        String state = txtstate.getSelectedItem().toString();
-        String country = txtcountry.getSelectedItem().toString();
-        
-        
-        
-        
-        try{
-            Class.forName("java.sql.Driver");
-            con = DriverManager.getConnection("");
-            
-            
-            
-            
-        }catch(Exception ex)
-        {
-            
-            System.err.println(ex);
-            
-        }
-        
-        
-        
-        
-        
-    }//GEN-LAST:event_jButton2ActionPerformed
+
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Customer registered successfully!"
+        );
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Database Error: " + ex.getMessage()
+        );
+        ex.printStackTrace();
+    }
+}
+//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
