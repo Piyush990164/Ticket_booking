@@ -18,7 +18,68 @@ public class main extends javax.swing.JFrame {
      */
     public main() {
         initComponents();
+        applyBasicTheme();
     }
+
+    
+private void applyBasicTheme() {
+
+    // Dashboard background
+    jPanel1.setBackground(new Color(241, 245, 249));
+
+    // Sidebar
+    jPanel2.setBackground(new Color(23, 37, 84));
+
+    // Header
+    jPanel3.setBackground(new Color(219, 234, 254));
+
+    // Navigation panels
+    Color navColor = new Color(30, 41, 59);
+
+    jPanel5.setBackground(navColor);
+    jPanel6.setBackground(navColor);
+    jPanel8.setBackground(navColor);
+    jPanel9.setBackground(navColor);
+    jPanel10.setBackground(navColor);
+
+    // Remove old raised borders
+    jPanel5.setBorder(null);
+    jPanel6.setBorder(null);
+    jPanel8.setBorder(null);
+    jPanel9.setBorder(null);
+    jPanel10.setBorder(null);
+
+    // Navigation text
+    javax.swing.JLabel[] labels = {
+        jLabel2, jLabel3, jLabel4, jLabel5, jLabel6
+    };
+
+    for (javax.swing.JLabel label : labels) {
+        label.setForeground(Color.WHITE);
+        label.setFont(new java.awt.Font("Arial", 0, 12));
+    }
+
+    // Welcome heading
+    jLabel1.setText("Ticket Booking Dashboard");
+    jLabel1.setFont(new java.awt.Font("Arial", 1, 22));
+    jLabel1.setForeground(new Color(30, 41, 59));
+    jPanel3.remove(jLabel1);
+
+jLabel1.setHorizontalAlignment(
+    javax.swing.SwingConstants.CENTER
+);
+
+jPanel3.add(
+    jLabel1,
+    new org.netbeans.lib.awtextra.AbsoluteConstraints(
+        150, 10, 420, 40
+    )
+);
+
+jPanel3.revalidate();
+jPanel3.repaint();
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -50,10 +111,10 @@ public class main extends javax.swing.JFrame {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(31, 41, 55));
+        jPanel2.setBackground(new java.awt.Color(255, 204, 51));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel5.setBackground(new java.awt.Color(55, 65, 81));
+        jPanel5.setBackground(new java.awt.Color(204, 255, 204));
         jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -75,7 +136,7 @@ public class main extends javax.swing.JFrame {
 
         jPanel2.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 120, 40));
 
-        jPanel6.setBackground(new java.awt.Color(55, 65, 81));
+        jPanel6.setBackground(new java.awt.Color(204, 255, 204));
         jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -97,7 +158,7 @@ public class main extends javax.swing.JFrame {
 
         jPanel2.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 140, 120, 40));
 
-        jPanel8.setBackground(new java.awt.Color(55, 65, 81));
+        jPanel8.setBackground(new java.awt.Color(204, 255, 204));
         jPanel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -119,7 +180,7 @@ public class main extends javax.swing.JFrame {
 
         jPanel2.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 220, 120, 40));
 
-        jPanel9.setBackground(new java.awt.Color(55, 65, 81));
+        jPanel9.setBackground(new java.awt.Color(204, 255, 204));
         jPanel9.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel9.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -141,7 +202,7 @@ public class main extends javax.swing.JFrame {
 
         jPanel2.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 120, 40));
 
-        jPanel10.setBackground(new java.awt.Color(55, 65, 81));
+        jPanel10.setBackground(new java.awt.Color(204, 255, 204));
         jPanel10.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel10.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -165,7 +226,7 @@ public class main extends javax.swing.JFrame {
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 440));
 
-        jPanel3.setBackground(new java.awt.Color(229, 231, 235));
+        jPanel3.setBackground(new java.awt.Color(204, 204, 255));
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -192,70 +253,70 @@ public class main extends javax.swing.JFrame {
 
     private void jLabel2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseEntered
         // TODO add your handling code here:
-        Color c = new Color(0,0,0);
+        Color c = new Color(37,99,235);
         jPanel5.setBackground(c);
         jLabel2.setBackground(Color.white);
     }//GEN-LAST:event_jLabel2MouseEntered
 
     private void jLabel2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseExited
         // TODO add your handling code here:
-        Color c = new Color(0,190,128);
+        Color c = new Color(30,41,59);
         jPanel5.setBackground(c);
         jLabel2.setBackground(Color.black);
     }//GEN-LAST:event_jLabel2MouseExited
 
     private void jLabel3MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseEntered
         // TODO add your handling code here:
-        Color c = new Color(0,0,0);
+        Color c = new Color(37,99,235);
         jPanel9.setBackground(c);
         jLabel3.setBackground(Color.white);
     }//GEN-LAST:event_jLabel3MouseEntered
 
     private void jLabel3MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseExited
         // TODO add your handling code here:
-        Color c = new Color(0,190,128);
+        Color c = new Color(30,41,59);
         jPanel9.setBackground(c);
         jLabel3.setBackground(Color.black);
     }//GEN-LAST:event_jLabel3MouseExited
 
     private void jLabel4MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseEntered
         // TODO add your handling code here:
-        Color c = new Color(0,0,0);
+        Color c = new Color(37,99,235);
         jPanel6.setBackground(c);
         jLabel4.setBackground(Color.white);
     }//GEN-LAST:event_jLabel4MouseEntered
 
     private void jLabel4MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseExited
         // TODO add your handling code here:
-        Color c = new Color(0,190,128);
+        Color c = new Color(30,41,59);
         jPanel6.setBackground(c);
         jLabel4.setBackground(Color.black);
     }//GEN-LAST:event_jLabel4MouseExited
 
     private void jLabel6MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseEntered
         // TODO add your handling code here:
-        Color c = new Color(0,0,0);
+        Color c = new Color(37,99,235);
         jPanel10.setBackground(c);
         jLabel6.setBackground(Color.white);
     }//GEN-LAST:event_jLabel6MouseEntered
 
     private void jLabel6MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseExited
         // TODO add your handling code here:
-        Color c = new Color(0,190,128);
+        Color c = new Color(30,41,59);
         jPanel10.setBackground(c);
         jLabel6.setBackground(Color.black);
     }//GEN-LAST:event_jLabel6MouseExited
 
     private void jLabel5MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseEntered
         // TODO add your handling code here:
-        Color c = new Color(0,0,0);
+        Color c = new Color(37,99,235);
         jPanel8.setBackground(c);
         jLabel5.setBackground(Color.white);
     }//GEN-LAST:event_jLabel5MouseEntered
 
     private void jLabel5MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseExited
         // TODO add your handling code here:
-        Color c = new Color(0,190,128);
+        Color c = new Color(30,41,59);
         jPanel8.setBackground(c);
         jLabel5.setBackground(Color.black);
     }//GEN-LAST:event_jLabel5MouseExited

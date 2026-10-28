@@ -15,7 +15,166 @@ public class TicketBooking extends javax.swing.JFrame {
      */
     public TicketBooking() {
         initComponents();
+        addCustomerIdField();
+
+    jButton1.addActionListener(e -> bookTicket());
+}
+
+
+private javax.swing.JTextField customerIdField;
+
+private void addCustomerIdField() {
+
+    javax.swing.JLabel customerLabel =
+        new javax.swing.JLabel("Customer ID:");
+
+    customerIdField = new javax.swing.JTextField();
+
+    jPanel1.add(customerLabel,
+        new org.netbeans.lib.awtextra.AbsoluteConstraints(
+            280, 95, 100, 25
+        ));
+
+    jPanel1.add(customerIdField,
+        new org.netbeans.lib.awtextra.AbsoluteConstraints(
+            380, 95, 120, 25
+        ));
+
+    jPanel1.revalidate();
+    jPanel1.repaint();
+}
+
+
+
+private void bookTicket() {
+
+    // Get Customer ID
+    String customerIdText = customerIdField.getText().trim();
+    int customerId;
+
+    if (customerIdText.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please enter Customer ID!"
+        );
+        return;
     }
+
+    try {
+        customerId = Integer.parseInt(customerIdText);
+
+        if (customerId <= 0) {
+            throw new NumberFormatException();
+        }
+
+    } catch (NumberFormatException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please enter a valid numeric Customer ID!"
+        );
+        return;
+    }
+
+    // Check whether customer exists
+    String checkSql = "SELECT 1 FROM newcust WHERE regid = ?";
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(checkSql)) {
+
+        pst.setInt(1, customerId);
+
+        try (java.sql.ResultSet rs = pst.executeQuery()) {
+            if (!rs.next()) {
+                javax.swing.JOptionPane.showMessageDialog(
+                    this, "Customer not found! Register the customer first."
+                );
+                return;
+            }
+        }
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Database Error: " + ex.getMessage()
+        );
+        return;
+    }
+
+    // Get ticket details
+    String match = jComboBox2.getSelectedItem().toString();
+    String venue = jComboBox1.getSelectedItem().toString();
+    String time = jComboBox5.getSelectedItem().toString();
+    String date = jComboBox7.getSelectedItem().toString();
+    String gateTime = jComboBox6.getSelectedItem().toString();
+    String priceText = jComboBox3.getSelectedItem().toString();
+    String quantityText = jComboBox4.getSelectedItem().toString();
+
+    if (match.equals("Select") ||
+        venue.equals("Select") ||
+        time.trim().isEmpty() ||
+        time.equals("Select") ||
+        date.equals("Select") ||
+        priceText.equals("Select") ||
+        quantityText.equals("Select")) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please select all ticket details!"
+        );
+        return;
+    }
+
+    int price = Integer.parseInt(priceText);
+    int quantity = Integer.parseInt(quantityText);
+    int total = price * quantity;
+
+    // Save booking to SQLite
+    String sql = """
+        INSERT INTO bookings
+        (match_name, venue, match_time, match_date,
+         gate_open_time, ticket_price, quantity,
+         total_amount, customer_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(
+             sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+
+        pst.setString(1, match);
+        pst.setString(2, venue);
+        pst.setString(3, time);
+        pst.setString(4, date);
+        pst.setString(5, gateTime);
+        pst.setInt(6, price);
+        pst.setInt(7, quantity);
+        pst.setInt(8, total);
+        pst.setInt(9, customerId);
+
+        pst.executeUpdate();
+
+        try (java.sql.ResultSet keys = pst.getGeneratedKeys()) {
+            if (keys.next()) {
+                int ticketId = keys.getInt(1);
+                jLabel8.setText(String.valueOf(ticketId));
+            }
+        }
+
+        javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "Ticket booked successfully!\n" +
+            "Customer ID: " + customerId + "\n" +
+            "Match: " + match + "\n" +
+            "Quantity: " + quantity + "\n" +
+            "Total Amount: Rs. " + total
+        );
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Booking Error: " + ex.getMessage()
+        );
+        ex.printStackTrace();
+    }
+}
+
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.

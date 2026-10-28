@@ -8,7 +8,7 @@ import javax.naming.spi.DirStateFactory.Result;
 
 /**
  *
- * @author Makrani
+ * @author piyus
  */
 public class UpdateCustomer extends javax.swing.JFrame {
 
@@ -19,8 +19,8 @@ public class UpdateCustomer extends javax.swing.JFrame {
         initComponents();
     }
     //database connection
-    connection con;
-    preparedStatement pst;
+    java.sql.Connection con;
+    java.sql.PreparedStatement pst;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -241,44 +241,100 @@ public class UpdateCustomer extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtstaActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        // search ID;
+    
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
 
-        string idd = textid.hetText ();
-        
-        
-        try{
-            
-            Class.forName("java.sql.Drive");
+    String idd = txtid.getText().trim();
 
-            con = (connection) driverManager.getConnection ("jdbc:mysql//localhost:3306/airline","root","");
-            
-            pst = con.prepareStatment("select * from newcust where regid=?");
-            pst.setString(1, idd);
-            
-            ResultSet qur = pst.executeQuery();
-            if(qur.next()==true)
-            {
-                String name = qur.getString("fname");
-             
+    if (idd.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please enter a Customer ID!"
+        );
+        return;
+    }
+
+    String sql = "SELECT * FROM newcust WHERE regid = ?";
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+
+        pst.setString(1, idd);
+
+        try (java.sql.ResultSet rs = pst.executeQuery()) {
+
+            if (rs.next()) {
+                String name = rs.getString("fname");
+
                 txtname.setText(name);
-                
+
+                javax.swing.JOptionPane.showMessageDialog(
+                    this, "Customer found successfully!"
+                );
+
+            } else {
+                txtname.setText("");
+
+                javax.swing.JOptionPane.showMessageDialog(
+                    this, "Customer ID not found!"
+                );
             }
-            
-        }catch (Exception ex)
-        {
-            
-            System.err.println(ex);
         }
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Database Error: " + ex.getMessage()
+        );
+        ex.printStackTrace();
+    }
+}
+//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+ {
+
+    String id = txtid.getText().trim();
+    String name = txtname.getText().trim();
+
+    if (id.isEmpty() || name.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please enter Customer ID and Name!"
+        );
+        return;
+    }
+
+    String sql = "UPDATE newcust SET fname = ? WHERE regid = ?";
+
+    try (java.sql.Connection con = DatabaseConnection.getConnection();
+         java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+
+        pst.setString(1, name);
+        pst.setString(2, id);
+
+        int rowsUpdated = pst.executeUpdate();
+
+        if (rowsUpdated > 0) {
+            javax.swing.JOptionPane.showMessageDialog(
+                this, "Customer updated successfully!"
+            );
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(
+                this, "Customer ID not found!"
+            );
+        }
+
+    } catch (java.sql.SQLException ex) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Database Error: " + ex.getMessage()
+        );
+        ex.printStackTrace();
+    }
+}
+
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -368,45 +424,7 @@ public class UpdateCustomer extends javax.swing.JFrame {
     private javax.swing.JTextField txtname;
     private javax.swing.JTextField txtpin;
     private javax.swing.JComboBox<String> txtsta;
+}
     // End of variables declaration//GEN-END:variables
 
-    private static class string {
-
-        public string() {
-        }
-    }
-
-    private static class textid {
-
-        private static string hetText() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-
-        public textid() {
-        }
-    }
-
-    private static class connection {
-
-        public connection() {
-        }
-
-        private preparedStatement prepareStatment(String select__from_newcust) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    }
-
-    private static class preparedStatement {
-
-        public preparedStatement() {
-        }
-
-        private void setString(int i, string idd) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-
-        private void executeQuery() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    }
-}
+    
