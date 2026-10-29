@@ -17,8 +17,58 @@ public class TicketBooking extends javax.swing.JFrame {
         initComponents();
         addCustomerIdField();
 
-    jButton1.addActionListener(e -> bookTicket());
+        jButton1.addActionListener(e -> bookTicket());
+        addAvailabilityButton();
+    }
+    private void addAvailabilityButton() {
+    javax.swing.JButton availabilityButton =
+            new javax.swing.JButton("Check Availability");
+
+    availabilityButton.addActionListener(e -> checkSeatAvailability());
+
+    jPanel4.add(
+            availabilityButton,
+            new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 270, 170, 25)
+    );
+
+    jPanel4.revalidate();
+    jPanel4.repaint();
 }
+    private void checkSeatAvailability() {
+    String matchName = (String) jComboBox2.getSelectedItem();
+    String venue = (String) jComboBox1.getSelectedItem();
+    String matchTime = (String) jComboBox5.getSelectedItem();
+    String matchDate = (String) jComboBox7.getSelectedItem();
+
+    if (matchName == null || matchName.equals("Select")
+            || venue == null || venue.equals("Select")
+            || matchTime == null || matchTime.trim().isEmpty()
+            || matchTime.equals("Select")
+            || matchDate == null || matchDate.equals("Select")) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Please select the match, venue, time, and date.",
+                "Missing Information",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+        );
+        return;
+    }
+
+    SeatAvailabilityService service = new SeatAvailabilityService();
+
+    String result = service.checkAvailability(
+            matchName, venue, matchTime, matchDate
+    );
+
+    javax.swing.JOptionPane.showMessageDialog(
+            this,
+            result,
+            "Seat Availability",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+    );
+}
+    
 
 
 private javax.swing.JTextField customerIdField;
@@ -370,7 +420,21 @@ private void bookTicket() {
             java.util.logging.Logger.getLogger(TicketBooking.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        try {
+    DatabaseConnection.createCustomerTable();
+    DatabaseConnection.createBookingTable();
+    DatabaseConnection.addCustomerIdToBookings();
+    DatabaseConnection.createMatchCapacityTable();
+} catch (Exception e) {
+    e.printStackTrace();
+    javax.swing.JOptionPane.showMessageDialog(
+            null,
+            "Database initialization failed: " + e.getMessage(),
+            "Database Error",
+            javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+    return;
+}
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
