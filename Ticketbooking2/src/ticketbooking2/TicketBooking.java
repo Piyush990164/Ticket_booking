@@ -120,9 +120,33 @@ private void bookTicket() {
         return;
     }
 
-    int price = Integer.parseInt(priceText);
-    int quantity = Integer.parseInt(quantityText);
-    int total = price * quantity;
+    int price;
+int quantity;
+int total;
+
+try {
+    price = Integer.parseInt(priceText.trim());
+    quantity = Integer.parseInt(quantityText.trim());
+
+    if (price <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Ticket price must be greater than zero!");
+        return;
+    }
+
+    if (quantity <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(
+            this, "Please select a valid seat quantity!");
+        return;
+    }
+
+    total = Math.multiplyExact(price, quantity);
+
+} catch (NumberFormatException | ArithmeticException ex) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this, "Invalid ticket price or quantity!");
+    return;
+}
 
     // Save booking to SQLite
     String sql = """
