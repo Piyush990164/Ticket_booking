@@ -88,7 +88,7 @@ public class DatabaseConnection {
         }
     }
 
-    
+
 public static void addCustomerIdToBookings() {
 
     try (java.sql.Connection con = getConnection();
@@ -122,6 +122,38 @@ public static void addCustomerIdToBookings() {
     }
 }
 
+    // CREATE MATCH CAPACITY TABLE
+    public static void createMatchCapacityTable() {
+
+        String sql = """
+            CREATE TABLE IF NOT EXISTS match_capacity (
+                match_name TEXT NOT NULL,
+                venue TEXT NOT NULL,
+                match_time TEXT NOT NULL,
+                match_date TEXT NOT NULL,
+                total_seats INTEGER NOT NULL CHECK (total_seats > 0),
+                PRIMARY KEY (
+                    match_name, venue, match_time, match_date
+                )
+            )
+            """;
+
+        try (Connection con = getConnection();
+             java.sql.Statement stmt = con.createStatement()) {
+
+            stmt.executeUpdate(sql);
+            System.out.println(
+                "Match capacity table created successfully!"
+            );
+
+        } catch (SQLException e) {
+            System.err.println(
+                "Unable to create match capacity table!"
+            );
+            e.printStackTrace();
+        }
+    }
+
 
     // DISPLAY REGISTERED CUSTOMERS
     public static void showCustomers() {
@@ -148,7 +180,7 @@ public static void addCustomerIdToBookings() {
         }
     }
 
-    
+
 public static void showBookings() {
 
     String sql = "SELECT ticket_id, customer_id, match_name FROM bookings";
@@ -173,22 +205,24 @@ public static void showBookings() {
 }
 
 
-    // MAIN METHOD
-    public static void main(String[] args) {
+   // MAIN METHOD
+public static void main(String[] args) {
 
-        try (Connection con = getConnection()) {
-            System.out.println("SQLite database connected successfully!");
-            System.out.println("Database: " + con.getMetaData().getURL());
+    try (Connection con = getConnection()) {
+        System.out.println("SQLite database connected successfully!");
+        System.out.println("Database: " + con.getMetaData().getURL());
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        createCustomerTable();
-        createBookingTable();
-        addCustomerIdToBookings(); 
-        showCustomers();
-        showBookings();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return;
     }
+
+    createCustomerTable();
+    createBookingTable();
+    addCustomerIdToBookings();
+    createMatchCapacityTable();
+
+    showCustomers();
+    showBookings();
+}
 }
